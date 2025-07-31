@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   TIMER2                                                            07/31/2025 08:44:44 PAGE 1   
+C51 COMPILER V9.60.7.0   TIMER2                                                            07/31/2025 10:50:55 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE TIMER2
@@ -62,7 +62,7 @@ line level    source
   49   3              }
   50   2      
   51   2              // if (pwm_duty_add_cnt >= 133) // 13300us, 13.3ms
-C51 COMPILER V9.60.7.0   TIMER2                                                            07/31/2025 08:44:44 PAGE 2   
+C51 COMPILER V9.60.7.0   TIMER2                                                            07/31/2025 10:50:55 PAGE 2   
 
   52   2              if (pwm_duty_add_cnt >= 13) // 
   53   2              {

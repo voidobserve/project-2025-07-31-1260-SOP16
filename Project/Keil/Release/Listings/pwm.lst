@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 08:44:44 PAGE 1   
+C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 10:50:55 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE PWM
@@ -62,7 +62,7 @@ line level    source
   50          static volatile u16 buff_index_2 = 0;
   51          
   52          // 电源电压低于170V-AC,启动低压保护，电源电压高于170V-AC，关闭低压保护
-C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 08:44:44 PAGE 2   
+C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 10:50:55 PAGE 2   
 
   53          // 温度正常，才会进入到这里
   54          void according_pin9_to_adjust_pwm(void)
@@ -126,7 +126,7 @@ line level    source
                   // printf(",b=%lu,", adc_pin_9_avg);
               #endif
  113   1      
-C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 08:44:44 PAGE 3   
+C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 10:50:55 PAGE 3   
 
  114   1          // if (adc_pin_9_avg > t_adc_max)
  115   1          //     t_adc_max = adc_pin_9_avg;
@@ -190,7 +190,7 @@ line level    source
              -��定，进而降功率" 低
  172   2              flag_is_sub_power = 0;
  173   2              flag_is_sub_power2 = 0;
-C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 08:44:44 PAGE 4   
+C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 10:50:55 PAGE 4   
 
  174   2              flag_is_add_power = 1;
  175   2      #if 0
@@ -254,7 +254,7 @@ line level    source
              -�于 170VAC
  232   1          {
  233   2              // 锁定最大的占空比为50%，并且给相应标志位置一
-C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 08:44:44 PAGE 5   
+C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 10:50:55 PAGE 5   
 
  234   2              if (flag_is_pwm_sub_time_comes) // pwm占空比递减时间到来
  235   2              {
@@ -318,7 +318,7 @@ line level    source
  293   1          // 当9脚电压高于 3.6 V时，16脚输出1KHz 高电平,用于控制Q2的导通（用于关机）�
              -��
  294   1          // if (adc_val_pin_9 >= 3511)
-C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 08:44:44 PAGE 6   
+C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 10:50:55 PAGE 6   
 
  295   1          // {
  296   1          //     P14 = 1;
@@ -382,7 +382,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =      1    ----
-C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 08:44:44 PAGE 7   
+C51 COMPILER V9.60.7.0   PWM                                                               07/31/2025 10:50:55 PAGE 7   
 
 END OF MODULE INFORMATION.
 

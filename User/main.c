@@ -21,12 +21,15 @@
 #include <math.h>
 #include <stdio.h>
 
-float step = 70;
-float mi; // 幂
+// float step = 70;
+// float mi; // 幂
 // float rus; // 10的幂次方
 // float r_ms = 0;
 // #define USER_BAUD (115200UL)
 // #define USER_UART_BAUD ((SYSCLK - USER_BAUD) / (USER_BAUD))
+
+volatile float32 time_accumulate = 0.0;
+    
 
 #if USE_MY_DEBUG // 打印串口配置
 
@@ -57,26 +60,59 @@ void my_debug_config(void)
 // 开机缓启动，调节占空比：
 void adjust_pwm_duty_when_power_on(void)
 {
-    // if (jump_flag == 1)
-    // {
-    //     // break;
-    //     return
-    // }
+#if 0
     if (c_duty < 6000)
     {
+        /* step初始值为70 */
         mi = (step - 1) / (253 / 3) - 1;
         step += 0.5;
-        c_duty = pow(5, mi) * 60; // C 库函数 double pow(double x, double y) 返回 x 的 y 次幂
+        /*
+            C 库函数 double pow(double x, double y) 返回 x 的 y 次幂
+            原本是 c_duty = pow(5, mi) * 60，实际测试开机8s左右
+        */
+        c_duty = pow(5, mi) * 60;
     }
 
     if (c_duty >= 6000)
     {
         c_duty = 6000;
     }
+
     // printf("c_duty %d\n",c_duty);
+    printf("%d\n", c_duty);
 
     // delay_ms(16); // 每16ms调整一次PWM的脉冲宽度 ---- 校验码A488对应的时间
     // delay_ms(11); // 16 * 0.666 约为10.656   ---- 校验码B5E3对应的时间
+#endif
+
+
+
+    if (c_duty < PWM_DUTY_50_PERCENT)
+    {
+// 持续时间 40s，每13.3ms变化1
+#define STEP_1 ((float32)40000 / PWM_DUTY_50_PERCENT)
+        if (time_accumulate >= STEP_1)
+        {
+            time_accumulate -= STEP_1;
+            c_duty++;
+        }
+    }
+    else if (c_duty < PWM_DUTY_100_PERCENT)
+    {
+// 持续时间20s，每 6.66ms变化1
+#define STEP_2 ((float32)20000 / (PWM_DUTY_100_PERCENT - PWM_DUTY_50_PERCENT))
+        if (time_accumulate >= STEP_2)
+        {
+            time_accumulate -= STEP_2;
+            c_duty++;
+        }
+    }
+    else
+    {
+        c_duty = PWM_DUTY_100_PERCENT;
+    }
+
+    // printf("%u\n", c_duty);
 }
 
 void main(void)
@@ -115,18 +151,22 @@ void main(void)
     adc_sel_pin(ADC_SEL_PIN_GET_VOL); // 切换到9脚，准备检测9脚的电压
 
 // ===================================================================
-#if 1 // 开机缓慢启动（PWM信号变化平缓）
+#if 1        // 开机缓慢启动（PWM信号变化平缓）
     P14 = 0; // 16脚先输出低电平
     c_duty = 0;
     while (c_duty < 6000)
     {
+        /*
+            原本计划在开机缓启动时检测发送机供电是否稳定，但是实际测试发现容易误检，导致提前退出
+            现在只有框架，哪怕检测到发送机供电不稳定，也不会有任何操作
+        */
         adc_update_pin_9_adc_val(); // 采集并更新9脚的ad值
 
 #if USE_MY_DEBUG // 直接打印0，防止在串口+图像上看到错位
-        // printf(",b=0,");  // 防止错位
+                 // printf(",b=0,");  // 防止错位
 
 #endif
-    
+
         if (flag_is_pwm_sub_time_comes) // pwm递减时间到来
         {
             flag_is_pwm_sub_time_comes = 0;
@@ -138,11 +178,12 @@ void main(void)
                 {
                     // adjust_duty = c_duty;
                     break;
-                }                
+                }
             }
         }
 
-        if (flag_time_comes_during_power_on) // 如果调节时间到来 -- 13ms
+        // if (flag_time_comes_during_power_on) // 如果调节时间到来 -- 13ms
+        if (flag_time_comes_during_power_on) // 如果调节时间到来 -- 1 ms
         {
             flag_time_comes_during_power_on = 0;
             adjust_pwm_duty_when_power_on();

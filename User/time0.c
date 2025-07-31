@@ -76,9 +76,12 @@ void TIMR0_IRQHandler(void) interrupt TMR0_IRQn
             tmr0_flag = 1;
         }
 
-        if (cnt_during_power_on >= 13) // 13ms
+        // if (cnt_during_power_on >= 13) // 13ms
+        if (cnt_during_power_on >= 1) // 1 ms
         {
             cnt_during_power_on = 0;
+            
+            time_accumulate += 1.0; // 每次进入，表示经过了1ms
             flag_time_comes_during_power_on = 1;
         }
     }

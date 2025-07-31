@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 08:44:44 PAGE 1   
+C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 10:50:55 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE ADC
@@ -62,7 +62,7 @@ line level    source
   46   2                          ADC_BIAS_SEL(0x1);                                           // 偏置电流：1x
   47   2      
   48   2              ADC_CHS0 = ADC_ANALOG_CHAN(0x18) | // 选则引脚对应的通道（0x18--P30）
-C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 08:44:44 PAGE 2   
+C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 10:50:55 PAGE 2   
 
   49   2                         ADC_EXT_SEL(0x0);       // 选择外部通道
   50   2              ADC_CFG0 |= ADC_CHAN0_EN(0x1) |    // 使能通道0转换
@@ -126,7 +126,7 @@ line level    source
  107   2                  continue; // 丢弃前两次采样的
  108   2              if (g_temp_value > g_adcmax)
  109   2                  g_adcmax = g_temp_value; // 最大
-C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 08:44:44 PAGE 3   
+C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 10:50:55 PAGE 3   
 
  110   2              if (g_temp_value < g_adcmin)
  111   2                  g_adcmin = g_temp_value; // 最小
@@ -190,7 +190,7 @@ line level    source
              -�，再重启（重新上电）
  168   1          if (TEMP_75_5_MIN == temp_status)
  169   1          {
-C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 08:44:44 PAGE 4   
+C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 10:50:55 PAGE 4   
 
  170   2              return;
  171   2          }
@@ -254,7 +254,7 @@ line level    source
  228   2      
  229   2              if (0 == tmr1_is_open)
  230   2              {
-C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 08:44:44 PAGE 5   
+C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 10:50:55 PAGE 5   
 
  231   3                  tmr1_is_open = 1;
  232   3                  tmr1_cnt = 0;
@@ -318,7 +318,7 @@ line level    source
  288          void set_duty(void)
  289          {
  290   1          // static bit tmr0_is_open = 0;
-C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 08:44:44 PAGE 6   
+C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 10:50:55 PAGE 6   
 
  291   1      
  292   1          // 如果温度正常，根据9脚的状态来调节PWM占空比
@@ -382,7 +382,7 @@ line level    source
  350          // 更新9脚采集的ad值
  351          void adc_update_pin_9_adc_val(void)
  352          {
-C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 08:44:44 PAGE 7   
+C51 COMPILER V9.60.7.0   ADC                                                               07/31/2025 10:50:55 PAGE 7   
 
  353   1          adc_sel_pin(ADC_SEL_PIN_GET_VOL);
  354   1          // adc_val_pin_9_temp = adc_get_val();
