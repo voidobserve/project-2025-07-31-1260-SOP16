@@ -1,0 +1,117 @@
+C51 COMPILER V9.60.7.0   TIME0                                                             07/31/2025 08:44:44 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE TIME0
+OBJECT MODULE PLACED IN .\Release\Objects\time0.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\..\User\time0.c LARGE OPTIMIZE(8,SPEED) BROWSE INTVECTOR(0X000C) INCD
+                    -IR(..\..\Libraries\Include;..\..\User) INTERVAL(3) DEBUG OBJECTEXTEND PRINT(.\Release\Listings\time0.lst) OBJECT(.\Relea
+                    -se\Objects\time0.obj)
+
+line level    source
+
+   1          #include "time0.h"
+   2          
+   3          u8 ms_cnt = 0;
+   4          volatile bit tmr0_flag = 0;
+   5          
+   6          
+   7          static volatile u8 cnt_during_power_on = 0; // ø™ª˙ª∫∆Ù∂Ø£¨µ˜Ω⁄pwm’ºø’±» ±£¨ π”√µΩµƒº∆ ˝÷µ
+   8          volatile bit flag_time_comes_during_power_on = 0; // ±Í÷æŒª£¨ø™ª˙ª∫∆Ù∂Ø∆⁄º‰£¨µ˜Ω⁄ ±º‰µΩ¿¥
+   9          
+  10          /**
+  11           * @brief ≈‰÷√∂® ±∆˜TMR0£¨∂® ±∆˜ƒ¨»œπÿ±’
+  12           */
+  13          void tmr0_config(void)
+  14          {
+  15   1          __EnableIRQ(TMR0_IRQn); //  πƒ‹timer0÷–∂œ
+  16   1          IE_EA = 1;              //  πƒ‹◊‹÷–∂œ
+  17   1      
+  18   1      #define PEROID_VAL (SYSCLK / 128 / 1000 - 1) // ÷‹∆⁄÷µ=œµÕ≥ ±÷”/∑÷∆µ/∆µ¬  - 1
+  19   1          // …Ë÷√timer0µƒº∆ ˝π¶ƒ‹£¨≈‰÷√“ª∏ˆ∆µ¬ Œ™1kHzµƒ÷–∂œ
+  20   1          TMR_ALLCON = TMR0_CNT_CLR(0x1);                        // «Â≥˝º∆ ˝÷µ
+  21   1          TMR0_PRH = TMR_PERIOD_VAL_H((PEROID_VAL >> 8) & 0xFF); // ÷‹∆⁄÷µ
+  22   1          TMR0_PRL = TMR_PERIOD_VAL_L((PEROID_VAL >> 0) & 0xFF);
+  23   1          TMR0_CONH = TMR_PRD_PND(0x1) | TMR_PRD_IRQ_EN(0x1);                          // º∆ ˝µ»”⁄÷‹∆⁄ ±‘ –Ì∑¢…˙
+             -÷–∂œ
+  24   1          TMR0_CONL = TMR_SOURCE_SEL(0x7) | TMR_PRESCALE_SEL(0x7) | TMR_MODE_SEL(0x1); // —°‘ÒœµÕ≥ ±÷”£¨128∑÷∆µ£
+             -¨º∆ ˝ƒ£ Ω
+  25   1      }
+  26          
+  27          /**
+  28           * @brief ø™∆Ù∂® ±∆˜TMR0£¨ø™ ºº∆ ±
+  29           */
+  30          void tmr0_enable(void)
+  31          {
+  32   1          // ÷ÿ–¬∏¯TMR0≈‰÷√ ±÷”
+  33   1          TMR0_CONL &= ~(TMR_SOURCE_SEL(0x07)); // «Â≥˝∂® ±∆˜µƒ ±÷”‘¥≈‰÷√ºƒ¥Ê∆˜
+  34   1          TMR0_CONL |= TMR_SOURCE_SEL(0x06);    // ≈‰÷√∂® ±∆˜µƒ ±÷”‘¥£¨ π”√œµÕ≥ ±÷”£®‘º21MHz£©
+  35   1      
+  36   1          __EnableIRQ(TMR0_IRQn); //  πƒ‹÷–∂œ
+  37   1          IE_EA = 1;              // ¥Úø™◊‹÷–∂œ
+  38   1      }
+  39          
+  40          /**
+  41           * @brief πÿ±’∂® ±∆˜0£¨«Âø’º∆ ˝÷µ
+  42           */
+  43          void tmr0_disable(void)
+  44          {
+  45   1          // ≤ª∏¯∂® ±∆˜Ã·π© ±÷”£¨»√À¸Õ£÷πº∆ ˝
+  46   1          TMR0_CONL &= ~(TMR_SOURCE_SEL(0x07)); // «Â≥˝∂® ±∆˜µƒ ±÷”‘¥≈‰÷√ºƒ¥Ê∆˜
+  47   1          TMR0_CONL |= TMR_SOURCE_SEL(0x05);    // ≈‰÷√∂® ±∆˜µƒ ±÷”‘¥£¨≤ª”√»Œ∫Œ ±÷”
+  48   1      
+  49   1          // «Â≥˝∂® ±∆˜µƒº∆ ˝÷µ
+  50   1          TMR0_CNTL = 0;
+  51   1          TMR0_CNTH = 0;
+C51 COMPILER V9.60.7.0   TIME0                                                             07/31/2025 08:44:44 PAGE 2   
+
+  52   1      
+  53   1          __DisableIRQ(TMR0_IRQn); // πÿ±’÷–∂œ£®≤ª πƒ‹÷–∂œ£©
+  54   1      }
+  55          
+  56          // extern void fun(void);
+  57          // ∂® ±∆˜TMR0÷–∂œ∑˛ŒÒ∫Ø ˝
+  58          void TIMR0_IRQHandler(void) interrupt TMR0_IRQn
+  59          {
+  60   1          // Ω¯»Î÷–∂œ…Ë÷√IP£¨≤ªø……æ≥˝
+  61   1          __IRQnIPnPush(TMR0_IRQn);
+  62   1      
+  63   1          // ---------------- ”√ªß∫Ø ˝¥¶¿Ì -------------------
+  64   1      
+  65   1          // ÷‹∆⁄÷–∂œ
+  66   1          if (TMR0_CONH & TMR_PRD_PND(0x1))
+  67   1          {
+  68   2              TMR0_CONH |= TMR_PRD_PND(0x1); // «Â≥˝pending
+  69   2      
+  70   2              ms_cnt++;
+  71   2              cnt_during_power_on++;
+  72   2      
+  73   2              if (ms_cnt >= 25)
+  74   2              {
+  75   3                  ms_cnt = 0;
+  76   3                  tmr0_flag = 1;
+  77   3              }
+  78   2      
+  79   2              if (cnt_during_power_on >= 13) // 13ms
+  80   2              {
+  81   3                  cnt_during_power_on = 0;
+  82   3                  flag_time_comes_during_power_on = 1;
+  83   3              }
+  84   2          }
+  85   1      
+  86   1          // ÕÀ≥ˆ÷–∂œ…Ë÷√IP£¨≤ªø……æ≥˝
+  87   1          __IRQnIPnPop(TMR0_IRQn);
+  88   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    133    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      2    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      2    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
